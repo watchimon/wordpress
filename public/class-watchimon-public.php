@@ -86,10 +86,14 @@ class Watchimon_Public {
         $projectId = $options['project_id'];
         $projectSecret = $options['project_secret'];
 
-        echo "<script>\n";
-        echo "var airbrake = new airbrakeJs.Client({host: \"https://api.watchimon.de\", projectId: '".$projectId."', projectKey: '".$projectSecret."'});\n";
-        echo "</script>\n";
-        echo "<!-- Watchimon:".$projectId." -->\n";
+        $isFeLoggingEnabled = (isset($options['enable_frontend']) ? $options['enable_frontend'] : 0);
+
+        if($isFeLoggingEnabled == 1) {
+            echo "<script>\n";
+            echo "var airbrake = new airbrakeJs.Client({host: \"https://api.watchimon.de\", projectId: '" . $projectId . "', projectKey: '" . $projectSecret . "'});\n";
+            echo "</script>\n";
+        }
+        echo "<!-- Watchimon:" . $projectId . " -->\n";
     }
 
 }

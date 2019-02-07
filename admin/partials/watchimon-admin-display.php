@@ -29,6 +29,8 @@
         // Cleanup
         $project_id = (isset($options['project_id']) ? $options['project_id'] : '');
         $project_secret = (isset($options['project_secret']) ? $options['project_secret'] : '');
+        $enable_frontend = (isset($options['enable_frontend']) ? $options['enable_frontend'] : '');
+        $enable_backend = (isset($options['enable_backend']) ? $options['enable_backend'] : '');
         ?>
 
         <?php
@@ -37,6 +39,26 @@
         ?>
         <h2 class="title">Basis Konfiguration</h2>
         <p>Um Watchimon nutzen zu können, werden Projektschlüssel und Projektnummer benötigt. Je System kann nur ein Projektschlüssel/-nummer genutzt werden. Diese Daten werden benötigt, um die Anfragen zu verifizieren und dem Konto zuzuordnen.</p>
+        <!-- ProjectKey -->
+        <fieldset>
+            <legend class="screen-reader-text">
+                <span>Enable Logging for PHP-Errors</span>
+            </legend>
+            <label for="<?php echo $this->plugin_name; ?>-cleanup">
+                <input type="checkbox" id="<?php echo $this->plugin_name; ?>-enable_backend" name="<?php echo $this->plugin_name; ?>[enable_backend]" value="1" <?php checked($enable_backend, 1); ?> />
+                <span><?php esc_attr_e('Enable Logging for PHP-Errors', $this->plugin_name); ?></span>
+            </label>
+        </fieldset>
+        <!-- ProjectKey -->
+        <fieldset>
+            <legend class="screen-reader-text">
+                <span>Enable Logging for Frontend Errors (JavaScript)</span>
+            </legend>
+            <label for="<?php echo $this->plugin_name; ?>-cleanup">
+                <input type="checkbox" id="<?php echo $this->plugin_name; ?>-enable_frontend" name="<?php echo $this->plugin_name; ?>[enable_frontend]" value="1" <?php checked($enable_frontend, 1); ?> />
+                <span><?php esc_attr_e('Enable Logging for Frontend Errors (JavaScript)', $this->plugin_name); ?></span>
+            </label>
+        </fieldset>
         <!-- ProjectId -->
         <fieldset>
             <p><?php esc_attr_e('Project Key', $this->plugin_name); ?></p>

@@ -107,12 +107,13 @@ class Watchimon_Admin {
      *
      **/
     public function validate($input) {
-        // All checkboxes inputs
         $valid = array();
 
-        //Cleanup
         $valid['project_id'] = (isset($input['project_secret']) && !empty($input['project_id'])) ? $input['project_id']: '';
         $valid['project_secret'] = (isset($input['project_secret']) && !empty($input['project_secret'])) ? $input['project_secret']: '';
+
+        $valid['enable_backend'] = (isset($input['enable_backend']) && !empty($input['enable_backend'])) ? 1 : 0;
+        $valid['enable_frontend'] = (isset($input['enable_frontend']) && !empty($input['enable_frontend'])) ? 1 : 0;
 
         return $valid;
     }

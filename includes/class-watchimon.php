@@ -234,32 +234,40 @@ class Watchimon
 
     protected function initNotifier()
     {
-        require dirname(__DIR__)."/vendor/autoload.php";
-        // Create new Notifier instance.
-        $options = get_option($this->plugin_name);
-        $apiKey = $options['project_secret'];
-        $notifier = new \Airbrake\Notifier([
-            'projectId' => $apiKey,
-            'projectKey' => $apiKey,
-            'host' =>  'https://api.watchimon.de'
-        ]);
+        $isBeLoggingEnabled = $this->isLoggingEnabled();
 
-        // Set global notifier instance.
-        \Airbrake\Instance::set($notifier);
+        if($isBeLoggingEnabled) {
+            require dirname(__DIR__) . "/vendor/autoload.php";
+            // Create new Notifier instance.
+            $options = get_option($this->plugin_name);
+            $apiKey = $options['project_secret'];
+            $notifier = new \Airbrake\Notifier([
+                'projectId' => $apiKey,
+                'projectKey' => $apiKey,
+                'host' => 'https://api.watchimon.de'
+            ]);
 
-        // Register error and exception handlers.
-        $handler = new \Airbrake\ErrorHandler($notifier);
-        $handler->register();
+            // Set global notifier instance.
+            \Airbrake\Instance::set($notifier);
+
+            // Register error and exception handlers.
+            $handler = new \Airbrake\ErrorHandler($notifier);
+            $handler->register();
+        }
 
     }
 
     public static function handleExceptions($code = null, $message = null, $errfile = null, $errline = null, $errcontext = [])
     {
-        if (gettype($code) == 'object' && ($code instanceof \Error || $code instanceof \Exception)) {
-            Watchimon::handleErrors($code);
+        try {
+            if (gettype($code) == 'object' && ($code instanceof \Error || $code instanceof \Exception)) {
+                Watchimon::handleErrors($code);
+            }
+            \Airbrake\Instance::notify(new \Exception($message, $code));
+            restore_exception_handler();
+        } catch (\Exception $e) {
+            throw $e;
         }
-        \Airbrake\Instance::notify(new \Exception($message, $code));
-        restore_exception_handler();
     }
 
     /**
@@ -267,10 +275,24 @@ class Watchimon
      *
      * @throws Exception | Error
      */
-    public static function handleErrors($exception)
+    public static function handleErrors($code = null, $message = null, $errfile = null, $errline = null, $errcontext = [])
     {
-        \Airbrake\Instance::notify($exception);
+        if (gettype($code) == 'object' && ($code instanceof \Error || $code instanceof \Exception)) {
+            \Airbrake\Instance::notify($code);
+            throw  $code;
+        }
+        \Airbrake\Instance::notify(new \Exception($message, $code));
         restore_error_handler();
-        throw  $exception;
+        throw  new \Exception($message, $code);
+    }
+
+    /**
+     * @return array
+     */
+    protected function isLoggingEnabled()
+    {
+        $options = get_option($this->plugin_name);
+        $isBeLoggingEnabled = (isset($options['enable_backend']) ? $options['enable_backend'] : 0);
+        return $isBeLoggingEnabled;
     }
 }
